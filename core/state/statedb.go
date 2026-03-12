@@ -122,6 +122,16 @@ type StateDB struct {
 	StorageUpdated int
 	AccountDeleted int
 	StorageDeleted int
+
+	OnLog func(log *types.Log)
+
+	storageDiff *StorageDiff
+}
+
+// StorageDiff collects state diff without relying on snapshot
+type StorageDiff struct {
+	Accounts map[common.Hash][]byte
+	Storage  map[common.Hash]map[common.Hash][]byte
 }
 
 // New creates a new state from a given trie.
@@ -150,6 +160,10 @@ func New(root common.Hash, db Database, snaps *snapshot.Tree) (*StateDB, error) 
 			sdb.snapAccounts = make(map[common.Hash][]byte)
 			sdb.snapStorage = make(map[common.Hash]map[common.Hash][]byte)
 		}
+	}
+	sdb.storageDiff = &StorageDiff{
+		Accounts: make(map[common.Hash][]byte),
+		Storage:  make(map[common.Hash]map[common.Hash][]byte),
 	}
 	return sdb, nil
 }
@@ -195,6 +209,9 @@ func (s *StateDB) AddLog(log *types.Log) {
 	log.Index = s.logSize
 	s.logs[s.thash] = append(s.logs[s.thash], log)
 	s.logSize++
+	if s.OnLog != nil {
+		s.OnLog(log)
+	}
 }
 
 func (s *StateDB) GetLogs(hash common.Hash, blockHash common.Hash) []*types.Log {
@@ -471,6 +488,7 @@ func (s *StateDB) updateStateObject(obj *stateObject) {
 	if s.snap != nil {
 		s.snapAccounts[obj.addrHash] = snapshot.SlimAccountRLP(obj.data.Nonce, obj.data.Balance, obj.data.Root, obj.data.CodeHash)
 	}
+	s.storageDiff.Accounts[obj.addrHash] = snapshot.SlimAccountRLP(obj.data.Nonce, obj.data.Balance, obj.data.Root, obj.data.CodeHash)
 }
 
 // deleteStateObject removes the given object from the state trie.
@@ -798,6 +816,8 @@ func (s *StateDB) Finalise(deleteEmptyObjects bool) {
 				delete(s.snapAccounts, obj.addrHash)       // Clear out any previously updated account data (may be recreated via a ressurrect)
 				delete(s.snapStorage, obj.addrHash)        // Clear out any previously updated storage data (may be recreated via a ressurrect)
 			}
+			delete(s.storageDiff.Accounts, obj.addrHash)
+			delete(s.storageDiff.Storage, obj.addrHash)
 		} else {
 			obj.finalise(true) // Prefetch slots in the background
 		}
@@ -981,6 +1001,26 @@ func (s *StateDB) Commit(deleteEmptyObjects bool) (common.Hash, error) {
 		s.snap, s.snapDestructs, s.snapAccounts, s.snapStorage = nil, nil, nil, nil
 	}
 	return root, err
+}
+
+func (s *StateDB) Output() (map[common.Hash]struct{}, map[common.Hash][]byte, map[common.Hash]map[common.Hash][]byte, map[common.Hash][]byte) {
+	codes := make(map[common.Hash][]byte)
+	for addr := range s.stateObjectsDirty {
+		if obj := s.stateObjects[addr]; !obj.deleted {
+			if obj.code != nil && obj.dirtyCode {
+				codes[common.BytesToHash(obj.CodeHash())] = obj.code
+			}
+		}
+	}
+
+	destructs := make(map[common.Hash]struct{})
+	for addr := range s.stateObjectsDirty {
+		if obj := s.stateObjects[addr]; obj.deleted {
+			destructs[obj.addrHash] = struct{}{}
+		}
+	}
+
+	return destructs, s.storageDiff.Accounts, s.storageDiff.Storage, codes
 }
 
 // PrepareAccessList handles the preparatory steps for executing a state transition with

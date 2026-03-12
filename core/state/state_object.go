@@ -316,6 +316,8 @@ func (s *stateObject) updateTrie(db Database) Trie {
 	}
 	// The snapshot storage map for the object
 	var storage map[common.Hash][]byte
+	// The storageDiff map for the object
+	var diffStor map[common.Hash][]byte
 	// Insert all the pending updates into the trie
 	tr := s.getTrie(db)
 	hasher := s.db.hasher
@@ -349,6 +351,14 @@ func (s *stateObject) updateTrie(db Database) Trie {
 			}
 			storage[crypto.HashData(hasher, key[:])] = v // v will be nil if it's deleted
 		}
+		// Collect storage diff for storageDiff
+		if diffStor == nil {
+			if diffStor = s.db.storageDiff.Storage[s.addrHash]; diffStor == nil {
+				diffStor = make(map[common.Hash][]byte)
+				s.db.storageDiff.Storage[s.addrHash] = diffStor
+			}
+		}
+		diffStor[crypto.HashData(hasher, key[:])] = v
 		usedStorage = append(usedStorage, common.CopyBytes(key[:])) // Copy needed for closure
 	}
 	if s.db.prefetcher != nil {

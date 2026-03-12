@@ -130,12 +130,12 @@ func (ma *wemixAdmin) etcdNewConfig(newCluster bool) *embed.Config {
 	cfg.Dir = ma.etcdDir
 	cfg.Name = ma.self.Name
 	u, _ := url.Parse(fmt.Sprintf("https://%s:%d", "0.0.0.0", ma.self.Port+1))
-	cfg.LPUrls = []url.URL{*u}
+	cfg.ListenPeerUrls = []url.URL{*u}
 	u, _ = url.Parse(fmt.Sprintf("https://%s:%d", ma.self.Ip, ma.self.Port+1))
-	cfg.APUrls = []url.URL{*u}
+	cfg.AdvertisePeerUrls = []url.URL{*u}
 	u, _ = url.Parse(fmt.Sprintf("http://localhost:%d", ma.self.Port+2))
-	cfg.LCUrls = []url.URL{*u}
-	cfg.ACUrls = []url.URL{*u}
+	cfg.ListenClientUrls = []url.URL{*u}
+	cfg.AdvertiseClientUrls = []url.URL{*u}
 	if newCluster {
 		cfg.ClusterState = embed.ClusterStateFlagNew
 		cfg.ForceNewCluster = true

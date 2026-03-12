@@ -1,0 +1,56 @@
+# builder image
+
+
+FROM golang:1.23 as builder
+
+ARG ACCESS_TOKEN
+
+SHELL ["/bin/bash", "-c"]
+
+RUN apt-get update -q -y && apt-get upgrade -q -y
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends build-essential ca-certificates curl libjemalloc-dev liblz4-dev libsnappy-dev libzstd-dev libudev-dev git
+RUN git config --global url."https://x-access-token:${ACCESS_TOKEN}@github.com".insteadOf "https://github.com"
+
+RUN apt autoremove && apt autoclean
+
+WORKDIR /go-wemix
+
+COPY .git /go-wemix/.git
+
+COPY . .
+
+RUN git submodule update --init rocksdb
+
+WORKDIR /go-wemix/rocksdb
+
+ENV PORTABLE=1
+
+RUN make -j8 static_lib
+
+WORKDIR /go-wemix
+
+COPY go.mod .
+COPY go.sum .
+RUN go mod download
+
+RUN make
+
+FROM ubuntu:24.04
+
+RUN apt-get update && apt-get install -y ca-certificates wget libsnappy-dev libjemalloc-dev
+
+WORKDIR /usr/lib/x86_64-linux-gnu/
+
+RUN ln -sf libjemalloc.so.2 libjemalloc.so.1
+
+WORKDIR /app
+
+COPY --from=builder /go-wemix/build/gwemix.tar.gz /app
+
+RUN tar xf /app/gwemix.tar.gz && \
+    rm -f /app/gwemix.tar.gz
+
+EXPOSE 8588 8598 8589 8589/udp
+
+ENTRYPOINT ["/app/bin/gwemix"]
