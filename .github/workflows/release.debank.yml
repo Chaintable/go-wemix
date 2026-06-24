@@ -27,12 +27,6 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
-      - uses: tibdex/github-app-token@v1
-        id: generate-token
-        with:
-          app_id: ${{ secrets.RELEASE_MANAGER_APP_ID }}
-          private_key: ${{ secrets.RELEASE_MANAGER_APP_SECRET }}
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -51,7 +45,7 @@ jobs:
 
       - name: Build image and push to ECR
         run: |
-          docker build --build-arg ACCESS_TOKEN=${{ steps.generate-token.outputs.token }} -t ${REGISTRY}/${IMAGE}:${{ matrix.arch }}-${REVISION} -f ${DOCKERFILE} .
+          docker build -t ${REGISTRY}/${IMAGE}:${{ matrix.arch }}-${REVISION} -f ${DOCKERFILE} .
           docker push ${REGISTRY}/${IMAGE}:${{ matrix.arch }}-${REVISION}
           docker run --name dryrun --rm ${REGISTRY}/${IMAGE}:${{ matrix.arch }}-${REVISION} version
           docker rmi ${REGISTRY}/${IMAGE}:${{ matrix.arch }}-${REVISION}
