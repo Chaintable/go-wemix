@@ -3,14 +3,11 @@
 
 FROM golang:1.23 as builder
 
-ARG ACCESS_TOKEN=""
-
 SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update -q -y && apt-get upgrade -q -y
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends build-essential ca-certificates curl libjemalloc-dev liblz4-dev libsnappy-dev libzstd-dev libudev-dev git
-RUN if [ -n "$ACCESS_TOKEN" ]; then git config --global url."https://x-access-token:${ACCESS_TOKEN}@github.com".insteadOf "https://github.com"; fi
 
 RUN apt autoremove && apt autoclean
 
