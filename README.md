@@ -1,3 +1,24 @@
+# Chaintable write node
+
+> Fork of [wemixarchive/go-wemix](https://github.com/wemixarchive/go-wemix), with Chaintable pipeline patches.
+
+## Architecture
+
+This repo runs the chain's execution layer with the [Chaintable pipeline](https://github.com/Chaintable/pipeline) tracer embedded. The tracer extracts block data — block headers, transactions, call traces, receipts, events, and state diffs — and ships it to **S3 + Kafka** (see pipeline's [architecture](https://github.com/Chaintable/pipeline/blob/main/docs/architecture.md)). Two consumption paths:
+
+- **Block headers + state diffs** → Kafka + S3 → [leafage-evm](https://github.com/Chaintable/leafage-evm): a lightweight EVM executor serving state queries (`eth_call`, `eth_estimateGas`, …), no P2P sync, no tx storage (see its [architecture](https://github.com/Chaintable/leafage-evm#architecture)).
+- **Block files** (transactions · call traces · receipts · events) → S3 → Chaintable's transaction/trace indexing pipeline.
+
+```
+Chaintable write node (this repo · producer, embeds pipeline tracer)
+        │
+        ├─ block headers + state diffs ──────────────────→ Kafka + S3 ─→ leafage-evm (EVM state queries)
+        │
+        └─ block files (tx · trace · receipts · events) ──→ S3 ─→ Chaintable indexing pipeline (tx/trace data)
+```
+
+---
+
 ## Go Wemix
 
 Golang implementation of the Wemix project.
@@ -180,15 +201,9 @@ See documentation [here](local-docker-env/README.md)
 
 Official Golang implementation of the Ethereum protocol.
 
-[![API Reference](
-https://camo.githubusercontent.com/915b7be44ada53c290eb157634330494ebe3e30a/68747470733a2f2f676f646f632e6f72672f6769746875622e636f6d2f676f6c616e672f6764646f3f7374617475732e737667
-)](https://pkg.go.dev/github.com/ethereum/go-ethereum?tab=doc)
-[![Go Report Card](https://goreportcard.com/badge/github.com/ethereum/go-ethereum)](https://goreportcard.com/report/github.com/ethereum/go-ethereum)
-[![Travis](https://travis-ci.com/ethereum/go-ethereum.svg?branch=master)](https://travis-ci.com/ethereum/go-ethereum)
-[![Discord](https://img.shields.io/badge/discord-join%20chat-blue.svg)](https://discord.gg/nthXNEv)
-
-Automated builds are available for stable releases and the unstable master branch. Binary
-archives are published at https://geth.ethereum.org/downloads/.
+Automated builds are available for stable releases. Binary archives and release images for
+this Chaintable write node are published at https://github.com/Chaintable/go-wemix/releases
+(CI also publishes container images to Chaintable's public ECR).
 
 ## Building the source
 
