@@ -15,6 +15,8 @@ github.com/BurntSushi/toml v0.3.1 h1:WXkYYl6Yr3qBf1K79EBnL4mak0OimBfB0XUf9Vl28OQ
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/Chaintable/pipeline v0.0.63-wemix-0.10.13-1 h1:psx+DHf/Mm4TpTowJmRRlHgCn7Fa+Eo7TGuajh6GCRk=
 github.com/Chaintable/pipeline v0.0.63-wemix-0.10.13-1/go.mod h1:vi0RxH6r1PHmCwPyL2kEimg0lTDrneg1AuEz+Qd7hSo=
+github.com/Chaintable/pipeline v0.0.64-0.20260814100014-644b2e1706a7 h1:GA8WPsl47UD6zbOWx4NVGy7WnPjdWi9MlDJmUmeJX+0=
+github.com/Chaintable/pipeline v0.0.64-0.20260814100014-644b2e1706a7/go.mod h1:vi0RxH6r1PHmCwPyL2kEimg0lTDrneg1AuEz+Qd7hSo=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/StackExchange/wmi v1.2.1 h1:VIkavFPXSjcnS+O8yTq7NI32k0R5Aj+v39y29VYDOSA=
 github.com/StackExchange/wmi v1.2.1/go.mod h1:rcmrprowKIVzvc+NUiLncP2uuArMWLCbu9SBzvHz7e8=
