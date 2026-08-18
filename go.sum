@@ -13,8 +13,8 @@ github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v0.3.0 h1:Px2UA+2RvSSvv+RvJ
 github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v0.3.0/go.mod h1:tPaiy8S5bQ+S5sOiDlINkp7+Ef339+Nz5L5XO+cnOHo=
 github.com/BurntSushi/toml v0.3.1 h1:WXkYYl6Yr3qBf1K79EBnL4mak0OimBfB0XUf9Vl28OQ=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
-github.com/Chaintable/pipeline v0.0.63-wemix-0.10.13-1 h1:psx+DHf/Mm4TpTowJmRRlHgCn7Fa+Eo7TGuajh6GCRk=
-github.com/Chaintable/pipeline v0.0.63-wemix-0.10.13-1/go.mod h1:vi0RxH6r1PHmCwPyL2kEimg0lTDrneg1AuEz+Qd7hSo=
+github.com/Chaintable/pipeline v0.0.63-wemix-0.10.13-2 h1:hX/hn6+cDUSQ2A7eGTNWZvmS90/ohpbOp8BtPHjCxY0=
+github.com/Chaintable/pipeline v0.0.63-wemix-0.10.13-2/go.mod h1:vi0RxH6r1PHmCwPyL2kEimg0lTDrneg1AuEz+Qd7hSo=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/StackExchange/wmi v1.2.1 h1:VIkavFPXSjcnS+O8yTq7NI32k0R5Aj+v39y29VYDOSA=
 github.com/StackExchange/wmi v1.2.1/go.mod h1:rcmrprowKIVzvc+NUiLncP2uuArMWLCbu9SBzvHz7e8=
