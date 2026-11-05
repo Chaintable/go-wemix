@@ -18,6 +18,7 @@
 package eth
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math/big"
@@ -26,6 +27,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	ptracer "github.com/Chaintable/pipeline/tracer"
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
@@ -196,6 +198,15 @@ func New(stack *node.Node, config *ethconfig.Config) (*Ethereum, error) {
 			TriesInMemory:       config.TriesInMemory,
 		}
 	)
+	if config.VMTrace != "" {
+		liveTracer, err := newLiveTracer(config)
+		if err != nil {
+			return nil, err
+		}
+		// The legacy EVM only reports to its tracer in debug mode.
+		vmConfig.Debug = true
+		vmConfig.Tracer = liveTracer
+	}
 	eth.blockchain, err = core.NewBlockChain(chainDb, cacheConfig, chainConfig, eth.engine, vmConfig, eth.shouldPreserve, &config.TxLookupLimit)
 	if err != nil {
 		return nil, err
@@ -270,6 +281,26 @@ func New(stack *node.Node, config *ethconfig.Config) (*Ethereum, error) {
 	eth.shutdownTracker.MarkStartup()
 
 	return eth, nil
+}
+
+// newLiveTracer creates the tracer selected with --vmtrace. It traces blocks
+// while they are executed for import, so it needs full sync.
+func newLiveTracer(config *ethconfig.Config) (core.LiveTracer, error) {
+	if config.VMTrace != "pipeline" {
+		return nil, fmt.Errorf("unsupported VM tracer %q", config.VMTrace)
+	}
+	if config.SyncMode != downloader.FullSync {
+		return nil, fmt.Errorf("--vmtrace requires --syncmode=full, have %s", config.SyncMode)
+	}
+	traceConfig := json.RawMessage("{}")
+	if config.VMTraceJsonConfig != "" {
+		traceConfig = json.RawMessage(config.VMTraceJsonConfig)
+	}
+	tracer, err := ptracer.NewPipelineTracer(traceConfig)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create pipeline tracer: %w", err)
+	}
+	return tracer, nil
 }
 
 func makeExtraData(extra []byte) []byte {

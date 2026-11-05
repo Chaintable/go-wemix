@@ -17,6 +17,8 @@ github.com/Chaintable/pipeline v0.0.63-wemix-0.10.13-2 h1:hX/hn6+cDUSQ2A7eGTNWZv
 github.com/Chaintable/pipeline v0.0.63-wemix-0.10.13-2/go.mod h1:vi0RxH6r1PHmCwPyL2kEimg0lTDrneg1AuEz+Qd7hSo=
 github.com/Chaintable/pipeline v0.0.63-wemix-0.10.13-3 h1:R/eYlVQRc+wxHGAHIvjnjxVAuMolRs6tW9ypJYWGjY4=
 github.com/Chaintable/pipeline v0.0.63-wemix-0.10.13-3/go.mod h1:vi0RxH6r1PHmCwPyL2kEimg0lTDrneg1AuEz+Qd7hSo=
+github.com/Chaintable/pipeline v0.0.64-0.20261105135359-88ccba8dc7ca h1:nvIeSXsswoR3060aEmFXLaEMJ/IZuvJwnN7bua3YJP4=
+github.com/Chaintable/pipeline v0.0.64-0.20261105135359-88ccba8dc7ca/go.mod h1:vi0RxH6r1PHmCwPyL2kEimg0lTDrneg1AuEz+Qd7hSo=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/StackExchange/wmi v1.2.1 h1:VIkavFPXSjcnS+O8yTq7NI32k0R5Aj+v39y29VYDOSA=
 github.com/StackExchange/wmi v1.2.1/go.mod h1:rcmrprowKIVzvc+NUiLncP2uuArMWLCbu9SBzvHz7e8=
