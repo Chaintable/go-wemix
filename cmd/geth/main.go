@@ -149,6 +149,8 @@ var (
 		utils.DeveloperPeriodFlag,
 		utils.DeveloperGasLimitFlag,
 		utils.VMEnableDebugFlag,
+		utils.VMTraceFlag,
+		utils.VMTraceJSONConfigFlag,
 		utils.NetworkIdFlag,
 		utils.EthStatsURLFlag,
 		utils.FakePoWFlag,

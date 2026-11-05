@@ -187,6 +187,10 @@ type Config struct {
 	// Enables tracking of SHA3 preimages in the VM
 	EnablePreimageRecording bool
 
+	// Live tracer fed by block import ("pipeline") and its JSON configuration
+	VMTrace           string
+	VMTraceJsonConfig string
+
 	// Miscellaneous options
 	DocRoot string `toml:"-"`
 

@@ -212,6 +212,7 @@ type BlockChain struct {
 	processor  Processor // Block transaction processor interface
 	forker     *ForkChoice
 	vmConfig   vm.Config
+	liveTracer LiveTracer // Tracer fed by block import, nil unless --vmtrace is set
 }
 
 // NewBlockChain returns a fully initialised block chain using information
@@ -258,6 +259,7 @@ func NewBlockChain(db ethdb.Database, cacheConfig *CacheConfig, chainConfig *par
 	bc.validator = NewBlockValidator(chainConfig, bc, engine)
 	bc.prefetcher = newStatePrefetcher(chainConfig, bc, engine)
 	bc.processor = NewStateProcessor(chainConfig, bc, engine)
+	bc.liveTracer, _ = vmConfig.Tracer.(LiveTracer)
 
 	var err error
 	bc.hc, err = NewHeaderChain(db, chainConfig, engine, bc.insertStopped)
@@ -385,6 +387,20 @@ func NewBlockChain(db ethdb.Database, cacheConfig *CacheConfig, chainConfig *par
 			recover = true
 		}
 		bc.snaps, _ = snapshot.New(bc.db, bc.stateCache.TrieDB(), bc.cacheConfig.SnapshotLimit, head.Root(), !bc.cacheConfig.SnapshotWait, true, recover)
+	}
+
+	if bc.liveTracer != nil {
+		if err := bc.liveTracer.OnBlockchainInit(chainConfig); err != nil {
+			return nil, fmt.Errorf("failed to init live tracer: %w", err)
+		}
+		if bc.CurrentBlock().NumberU64() == 0 {
+			alloc, err := ReadGenesisAlloc(db, bc.genesisBlock.Hash())
+			if err != nil {
+				bc.liveTracer.OnClose()
+				return nil, fmt.Errorf("live tracer cannot publish the genesis block: %w", err)
+			}
+			bc.liveTracer.OnGenesisBlock(bc.genesisBlock, alloc)
+		}
 	}
 
 	// Start future block processor.
@@ -824,6 +840,10 @@ func (bc *BlockChain) Stop() {
 	bc.chainmu.Close()
 	bc.wg.Wait()
 
+	if bc.liveTracer != nil {
+		bc.liveTracer.OnClose()
+	}
+
 	// Ensure that the entirety of the state snapshot is journalled to disk.
 	var snapBase common.Hash
 	if bc.snaps != nil {
@@ -1182,6 +1202,14 @@ func (bc *BlockChain) InsertReceiptChain(blockChain types.Blocks, receiptChain [
 }
 
 var lastWrite uint64
+
+// endLiveTraceBlock tells the live tracer that importing the current block
+// failed, so it is not published.
+func (bc *BlockChain) endLiveTraceBlock(err error) {
+	if bc.liveTracer != nil {
+		bc.liveTracer.OnBlockEnd(err)
+	}
+}
 
 // writeBlockWithoutState writes only the block and its metadata to the database,
 // but does not write any state. This is used to construct competing side forks
@@ -1624,7 +1652,7 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals, setHead bool)
 				throwaway, _ := state.New(parent.Root, bc.stateCache, bc.snaps)
 
 				go func(start time.Time, followup *types.Block, throwaway *state.StateDB, interrupt *uint32) {
-					bc.prefetcher.Prefetch(followup, throwaway, bc.vmConfig, &followupInterrupt)
+					bc.prefetcher.Prefetch(followup, throwaway, withoutLiveTracer(bc.vmConfig), &followupInterrupt)
 
 					blockPrefetchExecuteTimer.Update(time.Since(start))
 					if atomic.LoadUint32(interrupt) == 1 {
@@ -1636,8 +1664,12 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals, setHead bool)
 
 		// Process block using the parent state as reference point
 		substart := time.Now()
+		if bc.liveTracer != nil {
+			bc.liveTracer.OnBlockStart(block)
+		}
 		receipts, logs, usedGas, err := bc.processor.Process(block, statedb, bc.vmConfig)
 		if err != nil {
+			bc.endLiveTraceBlock(err)
 			bc.reportBlock(block, receipts, err)
 			atomic.StoreUint32(&followupInterrupt, 1)
 			return it.index, err
@@ -1658,9 +1690,19 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals, setHead bool)
 		// Validate the state using the default validator
 		substart = time.Now()
 		if err := bc.validator.ValidateState(block, statedb, receipts, usedGas); err != nil {
+			bc.endLiveTraceBlock(err)
 			bc.reportBlock(block, receipts, err)
 			atomic.StoreUint32(&followupInterrupt, 1)
 			return it.index, err
+		}
+		if bc.liveTracer != nil {
+			// ValidateState computed the root, so the state changes are final.
+			destructs, accounts, storages, codes := statedb.Output()
+			bc.liveTracer.OnCommit(parent.Root, block.Root(), destructs, accounts, storages, codes)
+			// Publish before writing: a block written but not published would
+			// not be imported again after a crash and stay missing for good,
+			// while one published but not written is imported and published again.
+			bc.liveTracer.OnBlockEnd(nil)
 		}
 		proctime := time.Since(start)
 
@@ -1679,6 +1721,11 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals, setHead bool)
 			status, err = bc.writeBlockAndSetHead(block, receipts, logs, statedb, false)
 		}
 		atomic.StoreUint32(&followupInterrupt, 1)
+		if bc.liveTracer != nil && err == nil && status == CanonStatTy {
+			if err := bc.liveTracer.PushHead(block.Header(), bc.GetHeaderByHash); err != nil {
+				log.Error("Failed to push pipeline head", "number", block.NumberU64(), "hash", block.Hash(), "err", err)
+			}
+		}
 		if err != nil {
 			return it.index, err
 		}
