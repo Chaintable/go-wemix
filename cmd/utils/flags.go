@@ -524,6 +524,15 @@ var (
 		Name:  "vmdebug",
 		Usage: "Record information useful for VM and contract debugging",
 	}
+	VMTraceFlag = cli.StringFlag{
+		Name:  "vmtrace",
+		Usage: "Name of the live tracer fed by block import (supported: pipeline)",
+	}
+	VMTraceJSONConfigFlag = cli.StringFlag{
+		Name:  "vmtrace.jsonconfig",
+		Usage: "Live tracer configuration (JSON)",
+		Value: "{}",
+	}
 	InsecureUnlockAllowedFlag = cli.BoolFlag{
 		Name:  "allow-insecure-unlock",
 		Usage: "Allow insecure account unlocking when account-related RPCs are exposed by http",
@@ -1824,6 +1833,10 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 	if ctx.GlobalIsSet(VMEnableDebugFlag.Name) {
 		// TODO(fjl): force-enable this in --dev mode
 		cfg.EnablePreimageRecording = ctx.GlobalBool(VMEnableDebugFlag.Name)
+	}
+	if ctx.GlobalIsSet(VMTraceFlag.Name) {
+		cfg.VMTrace = ctx.GlobalString(VMTraceFlag.Name)
+		cfg.VMTraceJsonConfig = ctx.GlobalString(VMTraceJSONConfigFlag.Name)
 	}
 
 	if ctx.GlobalIsSet(RPCGlobalGasCapFlag.Name) {

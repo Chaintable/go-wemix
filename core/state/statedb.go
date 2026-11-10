@@ -756,6 +756,22 @@ func (s *StateDB) Copy() *StateDB {
 			state.snapStorage[k] = temp
 		}
 	}
+	// Deep copy the collected state diff: updating the copy writes into it.
+	// OnLog is not copied, so copies never report logs to a live tracer.
+	state.storageDiff = &StorageDiff{
+		Accounts: make(map[common.Hash][]byte, len(s.storageDiff.Accounts)),
+		Storage:  make(map[common.Hash]map[common.Hash][]byte, len(s.storageDiff.Storage)),
+	}
+	for k, v := range s.storageDiff.Accounts {
+		state.storageDiff.Accounts[k] = v
+	}
+	for k, v := range s.storageDiff.Storage {
+		temp := make(map[common.Hash][]byte, len(v))
+		for kk, vv := range v {
+			temp[kk] = vv
+		}
+		state.storageDiff.Storage[k] = temp
+	}
 	return state
 }
 

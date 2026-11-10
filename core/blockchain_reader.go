@@ -350,9 +350,11 @@ func (bc *BlockChain) Genesis() *types.Block {
 	return bc.genesisBlock
 }
 
-// GetVMConfig returns the block chain VM config.
+// GetVMConfig returns the block chain VM config for executions other than
+// block import, so callers never feed the live tracer.
 func (bc *BlockChain) GetVMConfig() *vm.Config {
-	return &bc.vmConfig
+	cfg := withoutLiveTracer(bc.vmConfig)
+	return &cfg
 }
 
 // SetTxLookupLimit is responsible for updating the txlookup limit to the

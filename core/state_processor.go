@@ -73,6 +73,10 @@ func (p *StateProcessor) Process(block *types.Block, statedb *state.StateDB, cfg
 	}
 	blockContext := NewEVMBlockContext(header, p.bc, nil)
 	vmenv := vm.NewEVM(blockContext, vm.TxContext{}, statedb, p.config, cfg)
+	liveTracer, _ := cfg.Tracer.(LiveTracer)
+	if liveTracer != nil {
+		statedb.OnLog = liveTracer.OnLog
+	}
 	// Iterate over and process the individual transactions
 	for i, tx := range block.Transactions() {
 		msg, err := tx.AsMessage(types.MakeSigner(p.config, header.Number), header.BaseFee)
@@ -80,7 +84,13 @@ func (p *StateProcessor) Process(block *types.Block, statedb *state.StateDB, cfg
 			return nil, nil, 0, fmt.Errorf("could not apply tx %d [%v]: %w", i, tx.Hash().Hex(), err)
 		}
 		statedb.Prepare(tx.Hash(), i)
+		if liveTracer != nil {
+			liveTracer.OnTxStart(tx, msg.From())
+		}
 		receipt, err := applyTransaction(msg, p.config, gp, statedb, blockNumber, blockHash, tx, usedGas, fees, vmenv)
+		if liveTracer != nil {
+			liveTracer.OnTxEnd(receipt, err)
+		}
 		if err != nil {
 			return nil, nil, 0, fmt.Errorf("could not apply tx %d [%v]: %w", i, tx.Hash().Hex(), err)
 		}
