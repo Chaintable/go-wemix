@@ -19,6 +19,7 @@ package prometheus
 import (
 	"bytes"
 	"fmt"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -56,6 +57,24 @@ func (c *collector) addGauge(name string, m metrics.Gauge) {
 
 func (c *collector) addGaugeFloat64(name string, m metrics.GaugeFloat64) {
 	c.writeGaugeCounter(name, m.Value())
+}
+
+// addGaugeInfo writes an info metric as a gauge of value 1 whose labels carry
+// the information, e.g. pipeline_node_info {chain_id="1111", role="writer"} 1.
+// An info metric that was never set has nothing to report and is skipped.
+func (c *collector) addGaugeInfo(name string, m metrics.GaugeInfoSnapshot) {
+	value := m.Value()
+	if len(value) == 0 {
+		return
+	}
+	name = mutateKey(name)
+	labels := make([]string, 0, len(value))
+	for k, v := range value {
+		labels = append(labels, fmt.Sprintf("%s=%q", k, v))
+	}
+	sort.Strings(labels)
+	c.buff.WriteString(fmt.Sprintf(typeGaugeTpl, name))
+	c.buff.WriteString(fmt.Sprintf("%s {%s} 1\n\n", name, strings.Join(labels, ", ")))
 }
 
 func (c *collector) addHistogram(name string, m metrics.Histogram) {
