@@ -73,7 +73,13 @@ type StandardGaugeInfo struct {
 
 // Snapshot returns a read-only copy of the gauge.
 func (g *StandardGaugeInfo) Snapshot() GaugeInfoSnapshot {
-	return gaugeInfoSnapshot(g.value)
+	g.mutex.Lock()
+	defer g.mutex.Unlock()
+	snapshot := make(gaugeInfoSnapshot, len(g.value))
+	for k, v := range g.value {
+		snapshot[k] = v
+	}
+	return snapshot
 }
 
 // Update updates the gauge's value.
