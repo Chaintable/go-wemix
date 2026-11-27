@@ -1,6 +1,6 @@
 module github.com/ethereum/go-ethereum
 
-go 1.23.0
+go 1.25
 
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v0.3.0
@@ -14,7 +14,7 @@ require (
 	github.com/cespare/cp v0.1.0
 	github.com/charlanxcc/logrot v0.0.0-20180713171554-0c22fa310dfe
 	github.com/cloudflare/cloudflare-go v0.14.0
-	github.com/consensys/gnark-crypto v0.4.1-0.20210426202927-39ac3d4b3f1f
+	github.com/consensys/gnark-crypto v0.18.1
 	github.com/davecgh/go-spew v1.1.1
 	github.com/deckarep/golang-set v1.8.0
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.3.0
@@ -70,7 +70,7 @@ require (
 	golang.org/x/sys v0.31.0
 	golang.org/x/text v0.23.0
 	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba
-	golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d
+	golang.org/x/tools v0.26.0
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce
 	gopkg.in/urfave/cli.v1 v1.20.0
 )
@@ -96,6 +96,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sts v1.33.1 // indirect
 	github.com/aws/smithy-go v1.22.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
+	github.com/bits-and-blooms/bitset v1.20.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/coreos/go-semver v0.3.1 // indirect
@@ -129,10 +130,11 @@ require (
 	github.com/prometheus/common v0.26.0 // indirect
 	github.com/prometheus/procfs v0.6.0 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
+	github.com/rogpeppe/go-internal v1.16.0 // indirect
 	github.com/segmentio/kafka-go v0.4.47 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/soheilhy/cmux v0.1.5 // indirect
-	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/tklauser/go-sysconf v0.3.12 // indirect
 	github.com/tklauser/numcpus v0.6.1 // indirect
 	github.com/tmc/grpc-websocket-proxy v0.0.0-20201229170055-e5319fda7802 // indirect
@@ -151,7 +153,7 @@ require (
 	go.opentelemetry.io/proto/otlp v0.9.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
-	golang.org/x/mod v0.17.0 // indirect
+	golang.org/x/mod v0.21.0 // indirect
 	golang.org/x/net v0.38.0 // indirect
 	golang.org/x/term v0.30.0 // indirect
 	google.golang.org/genproto v0.0.0-20230711160842-782d3b101e98 // indirect
