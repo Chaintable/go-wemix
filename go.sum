@@ -13,10 +13,6 @@ github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v0.3.0 h1:Px2UA+2RvSSvv+RvJ
 github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v0.3.0/go.mod h1:tPaiy8S5bQ+S5sOiDlINkp7+Ef339+Nz5L5XO+cnOHo=
 github.com/BurntSushi/toml v0.3.1 h1:WXkYYl6Yr3qBf1K79EBnL4mak0OimBfB0XUf9Vl28OQ=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
-github.com/Chaintable/pipeline v0.0.63-wemix-0.10.13-2 h1:hX/hn6+cDUSQ2A7eGTNWZvmS90/ohpbOp8BtPHjCxY0=
-github.com/Chaintable/pipeline v0.0.63-wemix-0.10.13-2/go.mod h1:vi0RxH6r1PHmCwPyL2kEimg0lTDrneg1AuEz+Qd7hSo=
-github.com/Chaintable/pipeline v0.0.63-wemix-0.10.13-3 h1:R/eYlVQRc+wxHGAHIvjnjxVAuMolRs6tW9ypJYWGjY4=
-github.com/Chaintable/pipeline v0.0.63-wemix-0.10.13-3/go.mod h1:vi0RxH6r1PHmCwPyL2kEimg0lTDrneg1AuEz+Qd7hSo=
 github.com/Chaintable/pipeline v0.0.63-wemix-0.10.13-4 h1:K1+bum3qtLZ+/OQi8oS2CmUyyhi647hlPLj9v0wOfmU=
 github.com/Chaintable/pipeline v0.0.63-wemix-0.10.13-4/go.mod h1:vi0RxH6r1PHmCwPyL2kEimg0lTDrneg1AuEz+Qd7hSo=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
@@ -239,8 +235,8 @@ github.com/google/uuid v1.1.2/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+
 github.com/google/uuid v1.3.0 h1:t6JiXgmwXMjEs8VusXIJk2BXHsn+wx8BZdTaoZ5fu7I=
 github.com/google/uuid v1.3.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/gorilla/mux v1.8.0/go.mod h1:DVbg23sWSpFRCP0SfiEN6jmj59UnW/n46BH5rLB71So=
-github.com/gorilla/websocket v1.4.2 h1:+/TMaTYc4QFitKJxsQ7Yye35DkWvkdLcvGKqM+x0Ufc=
-github.com/gorilla/websocket v1.4.2/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
+github.com/gorilla/websocket v1.5.3 h1:saDtZ6Pbx/0u+bgYQ3q96pZgCzfhKXGPqt7kZ72aNNg=
+github.com/gorilla/websocket v1.5.3/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
 github.com/graph-gophers/graphql-go v1.3.0 h1:Eb9x/q6MFpCLz7jBCiP/WTxjSDrYLR1QY41SORZyNJ0=
 github.com/graph-gophers/graphql-go v1.3.0/go.mod h1:9CQHMSxwO4MprSdzoIEobiHpoLtHm77vfxsvsIN5Vuc=
 github.com/grpc-ecosystem/go-grpc-middleware v1.3.0 h1:+9834+KizmvFV7pXQGSXQTsaWhq2GjuNUt0aUU0YBYw=
